@@ -1,12 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Slot Game</title>
 </head>
 <body>
-    
-</body>
+    <div class="game">
+        <!-- <p>得点:<span id="score">0</span>&emsp;レベル:<span id="level">1</span></p> -->
+        
+        <!-- スロット画面3x3 -->
+        <table border="4">
+        <!-- 1列目 -->
+        <tr> 
+            <td id="r0" width="100" height="100">
+                <div class="slot">
+                <div id="slot0">1</div>
+                </div>
+            </td>
+            <td id="r0" width="100" height="100">
+                <div class="slot">
+                <div id="slot1">4</div>
+                </div>
+            </td>
+            <td id="r0" width="100" height="100">
+                <div class="slot">
+                <div id="slot2">7</div>
+                </div>
+            </td>
+        </tr>
+        
+        <!-- 2列目 -->
+        <tr> 
+            <td id="r1" width="100" height="100">
+                <div class="slot">
+                <div id="slot3">2</div>
+                </div>
+            </td>
+            <td id="r1" width="100" height="100">
+                <div class="slot">
+                <div id="slot4">5</div>
+                </div>
+            </td>
+            <td id="r1" width="100" height="100">
+                <div class="slot">
+                <div id="slot5">8</div>
+                </div>
+            </td>
+        </tr>
+
+        <!-- 3列目 -->
+        <tr> 
+            <td id="r2" width="100" height="100">
+                <div class="slot">
+                <div id="slot6">3</div>
+                </div>
+            </td>
+            <td id="r2" width="100" height="100">
+                <div class="slot">
+                <div id="slot7">6</div>
+                </div>
+            </td>
+            <td id="r2" width="100" height="100">
+                <div class="slot">
+                <div id="slot8">9</div>
+                </div>
+            </td>
+        </tr>
+
+        <!-- 4列目 -->
+        <tr> 
+            <td id="r3" width="100" height="100">
+                <div class="slot">
+                <!-- <input type="button" value="STOP" id="stop3"> -->
+                <a class="stopButton" id="stop3">STOP</a>
+                </div>
+            </td>
+            <td id="r3" width="100" height="100">
+                <div class="slot">
+                <!-- <input type="button" value="STOP" id="stop4"> -->
+                <a class="stopButton" id="stop4">STOP</a>
+                </div>
+            </td>
+            <td id="r3" width="100" height="100">
+                <div class="slot">
+                <!-- <input type="button" value="STOP" id="stop5"> -->
+                <a class="stopButton" id="stop5">STOP</a>
+                </div>
+            </td>
+        </tr>        
+        </table>
+
+        <br>
+        <input type="button" value="START" id="start">
+    </div>
+
+
+  
+    <script type="text/javascript">
+    // スロットゲームの処理
+    // 即時関数で囲っておく（スコープを限定）
+      (function(){
+        // var score = 0; // 得点
+        // var level = 1; // レベル
+        // var interval = 400; // スロットのスピード
+        var interval = 100; // スロットのスピード
+        var timers = []; // スロット
+        var results = []; // スロットを止めた時の数字
+        var stopCount = [0,0,0]; // スロットを止めたか判別に使用
+  
+        // 左のSTOPをクリックした時スロットを止める
+        document.getElementById('stop3').onclick = function() {      
+            stopSlot(3);
+        }
+  
+        // 中央のSTOPをクリックした時スロットを止める
+        document.getElementById('stop4').onclick = function() {
+            stopSlot(4);
+        }
+  
+        // 右のSTOPをクリックした時スロットを止める
+        document.getElementById('stop5').onclick = function() {
+            stopSlot(5);
+        }
+  
+        // スロットをスタートさせる
+        startSlot();
+  
+        function startSlot() {
+  
+          // 初期化（空の状態に戻す）
+          stopCount = [0,0,0]; // スロットを止めたか判別に使用
+          timers = []; // スロット
+          results = []; // スロットを止めた時の数字
+  
+          // スロットの最初の数字を設定
+          document.getElementById('slot0').textContent = 1;
+          document.getElementById('slot1').textContent = 4;
+          document.getElementById('slot2').textContent = 7;
+          document.getElementById('slot3').textContent = 2;
+          document.getElementById('slot4').textContent = 5;
+          document.getElementById('slot5').textContent = 8;
+          document.getElementById('slot6').textContent = 3;
+          document.getElementById('slot7').textContent = 6;
+          document.getElementById('slot8').textContent = 9;
+  
+          // スロットを回す
+          runSlot(0);
+          runSlot(1);
+          runSlot(2);
+          runSlot(3);
+          runSlot(4);
+          runSlot(5);
+          runSlot(6);
+          runSlot(7);
+          runSlot(8);
+        }
+  
+        // スロットを回す処理の中身
+        function runSlot(num) {
+  
+          // 全てのスロットの現在表示されているテキストを取得
+          var slotValue = document.getElementById('slot' + num);
+  
+          // 9より上の数字になったら0へ戻る
+          if(slotValue.textContent < 9) {
+            slotValue.textContent ++;
+          } else {
+            slotValue.textContent = 0;
+          }
+  
+          // スロットの数字をカウントさせる
+          timers[num] = setTimeout(function() {
+  
+            // スロットの数字をカウントさせる処理
+            runSlot(num);
+          }, interval);
+        }
+  
+        // スロットを止める処理の中身
+        function stopSlot(num) {
+  
+          // スロットを止める
+          clearTimeout(timers[num]);
+          clearTimeout(timers[num-3]);
+          clearTimeout(timers[num+3]);
+  
+          // スロットを止めた際の数字を取得
+          results[num] = document.getElementById('slot' + num).textContent;
+  
+          // スロットを止めたことを記録
+          stopCount[num] = 1;
+  
+          // 全てのスロットを止めた場合に結果を表示する
+          if (stopCount[3]*stopCount[4]*stopCount[5] == 1) {
+            checkResult();
+          }
+        }
+  
+        // 全てのスロットを止めた結果
+        function checkResult() {
+  
+          if (results[3] == results[4] && results[3] == results[5]) {
+            // alert('すごい！100点獲得！次のレベルに挑戦してね！');
+            alert('すごい！おめでとう！');
+  
+            // score += 100; // 得点を足す
+            // level += 1;
+            // interval *= 0.8; // スロットのスピードを早める
+            // 得点追加の処理
+            // getScore();
+            // 次のゲームに進む
+            // startSlot();
+          } else {
+            gameover();
+          }
+        }
+  
+        // 得点追加時の処理
+        function getScore() {
+          document.getElementById('score').textContent = score;
+          document.getElementById('level').textContent = level;
+        }
+  
+        // 揃えられなかった時
+        function gameover() {
+          alert('残念！またチャレンジしてね！');
+        }
+  
+        document.getElementById('start').onclick = function() {
+          // スロットを全て止める
+          clearTimeout(timers[3]);
+          clearTimeout(timers[4]);
+          clearTimeout(timers[5]);
+  
+          // 初期化
+        //   document.getElementById('score').textContent = 0;
+        //   document.getElementById('level').textContent = 1;
+        //   score = 0;
+        //   level = 1;
+          interval = 100;
+          timers = [];
+          results = [];
+          stopCount = [0,0,0];
+  
+          // スロットスタート
+          startSlot();
+        }
+  
+      })();
+  
+    </script>
+  
+    <style media="screen">
+    .slot {
+          font-size: 40px;
+    }
+  
+    .game {
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    table {
+        margin: 3px auto;    
+    }
+
+    .stopButton {
+        display:block;
+        width:70px;
+        height:70px;
+        margin:1em auto;
+        line-height:70px;
+        background:gray;
+        border-radius:100%;
+        color:#fff;
+        font-size:10px;
+        font-weight:bold;
+        text-decoration:none;
+        text-align:center;
+    }
+    </style>
+  </body>
 </html>
