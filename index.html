@@ -6,27 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slot Game</title>
 </head>
-<body>
+<body onload="imageSearch()">
     <div class="game">
         <!-- <p>得点:<span id="score">0</span>&emsp;レベル:<span id="level">1</span></p> -->
         
         <!-- スロット画面3x3 -->
         <table border="4">
         <!-- 1列目 -->
-        <tr> 
+        <tr hidden> 
             <td id="r0" width="100" height="100">
                 <div class="slot">
-                <div id="slot0">1</div>
+                <div id="slot0"></div>
                 </div>
             </td>
             <td id="r0" width="100" height="100">
                 <div class="slot">
-                <div id="slot1">4</div>
+                <div id="slot1"></div>
                 </div>
             </td>
             <td id="r0" width="100" height="100">
                 <div class="slot">
-                <div id="slot2">7</div>
+                <div id="slot2"></div>
                 </div>
             </td>
         </tr>
@@ -35,36 +35,36 @@
         <tr> 
             <td id="r1" width="100" height="100">
                 <div class="slot">
-                <div id="slot3">2</div>
+                <div id="slot3"></div>
                 </div>
             </td>
             <td id="r1" width="100" height="100">
                 <div class="slot">
-                <div id="slot4">5</div>
+                <div id="slot4"></div>
                 </div>
             </td>
             <td id="r1" width="100" height="100">
                 <div class="slot">
-                <div id="slot5">8</div>
+                <div id="slot5"></div>
                 </div>
             </td>
         </tr>
 
         <!-- 3列目 -->
-        <tr> 
+        <tr hidden> 
             <td id="r2" width="100" height="100">
                 <div class="slot">
-                <div id="slot6">3</div>
+                <div id="slot6"></div>
                 </div>
             </td>
             <td id="r2" width="100" height="100">
                 <div class="slot">
-                <div id="slot7">6</div>
+                <div id="slot7"></div>
                 </div>
             </td>
             <td id="r2" width="100" height="100">
                 <div class="slot">
-                <div id="slot8">9</div>
+                <div id="slot8"></div>
                 </div>
             </td>
         </tr>
@@ -93,12 +93,53 @@
         </table>
 
         <br>
-        <input type="button" value="START" id="start">
+        <input type="button" value="START" id="start" >
     </div>
 
 
   
     <script type="text/javascript">
+    let images;
+    // Flicker Photo Searchの実行
+    function imageSearch(){ 
+      // ユーザ入力のクエリを取得
+      var query = "早稲田"; 
+    	// FlickerPhotoSearchを実行するためのスクリプトを生成
+      var new_script = document.createElement('script');       
+      new_script.src = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=e3dd1f924e93066dad4011312e1700bd&format=json&jsoncallback=showResults&safe_search=1&sort=relevance&tags="+query;
+    	// 生成したスクリプトを自HTMLの先頭に追加してブラウザに実行させる
+      document.head.appendChild(new_script); 
+    }
+
+    // 検索結果の表示（dataに検索結果が入る（FlickerがJSON形式で入れてくれる））
+    function showResults(data){
+      // Flickerから戻るdata形式は https://www.flickr.com/services/api/flickr.photos.search.htmlのexample results
+      if (data.stat != "ok"){ // 検索が成功しているかどうか確認、失敗の時はstatusを表示して戻る
+        document.write(data.stat);
+        return;
+      }
+      // 最初の9個のデータのみ利用
+	    var max_num = 9;
+	    if (data.photos.photo.length < 9) {
+        max_num = data.photos.photo.length
+      }; // 9個より検索結果が少ない場合の処理
+      
+      images = data.photos.photo;
+      for (var i=0; i<max_num; i++){
+        var photo = data.photos.photo[i];
+        // imgエレメントを生成
+	      var new_image = document.createElement('img'); 
+	      // imgのsrcにi番目の結果(URL)を設定 (
+	      var url="https://farm"+photo.farm+".staticflickr.com/"+photo.server+"/"+photo.id+"_"+photo.secret+"_m.jpg";
+	      new_image.src = url ;
+	      new_image.width="100"; 	 // 幅を100ピクセルに設定 
+	      new_image.height="100"; 	 // 幅を100ピクセルに設定 
+	      new_image.id=String(i); 	 // 幅を100ピクセルに設定 
+ 	      // imgエレメントを検索結果のi番目のセルに追加
+ 	      document.getElementById("slot"+String(i)).appendChild(new_image);
+  	  }
+    }
+
     // スロットゲームの処理
     // 即時関数で囲っておく（スコープを限定）
       (function(){
@@ -126,7 +167,7 @@
         }
   
         // スロットをスタートさせる
-        startSlot();
+        // startSlot();
   
         function startSlot() {
   
@@ -135,16 +176,17 @@
           timers = []; // スロット
           results = []; // スロットを止めた時の数字
   
+          console.log(images)
           // スロットの最初の数字を設定
-          document.getElementById('slot0').textContent = 1;
-          document.getElementById('slot1').textContent = 4;
-          document.getElementById('slot2').textContent = 7;
-          document.getElementById('slot3').textContent = 2;
-          document.getElementById('slot4').textContent = 5;
-          document.getElementById('slot5').textContent = 8;
-          document.getElementById('slot6').textContent = 3;
-          document.getElementById('slot7').textContent = 6;
-          document.getElementById('slot8').textContent = 9;
+          document.getElementById('0').src = "https://farm"+images[1].farm+".staticflickr.com/"+images[1].server+"/"+images[1].id+"_"+images[1].secret+"_m.jpg";
+          document.getElementById('1').src = "https://farm"+images[4].farm+".staticflickr.com/"+images[4].server+"/"+images[4].id+"_"+images[4].secret+"_m.jpg";
+          document.getElementById('2').src = "https://farm"+images[7].farm+".staticflickr.com/"+images[7].server+"/"+images[7].id+"_"+images[7].secret+"_m.jpg";
+          document.getElementById('3').src = "https://farm"+images[2].farm+".staticflickr.com/"+images[2].server+"/"+images[2].id+"_"+images[2].secret+"_m.jpg";
+          document.getElementById('4').src = "https://farm"+images[5].farm+".staticflickr.com/"+images[5].server+"/"+images[5].id+"_"+images[5].secret+"_m.jpg";
+          document.getElementById('5').src = "https://farm"+images[8].farm+".staticflickr.com/"+images[8].server+"/"+images[8].id+"_"+images[8].secret+"_m.jpg";
+          document.getElementById('6').src = "https://farm"+images[3].farm+".staticflickr.com/"+images[3].server+"/"+images[3].id+"_"+images[3].secret+"_m.jpg";
+          document.getElementById('7').src = "https://farm"+images[6].farm+".staticflickr.com/"+images[6].server+"/"+images[6].id+"_"+images[6].secret+"_m.jpg";
+          document.getElementById('8').src = "https://farm"+images[9].farm+".staticflickr.com/"+images[9].server+"/"+images[9].id+"_"+images[9].secret+"_m.jpg";
   
           // スロットを回す
           runSlot(0);
@@ -160,15 +202,18 @@
   
         // スロットを回す処理の中身
         function runSlot(num) {
-  
           // 全てのスロットの現在表示されているテキストを取得
-          var slotValue = document.getElementById('slot' + num);
+          var slotValue = document.getElementById(num);
+          console.log(slotValue)
   
           // 9より上の数字になったら0へ戻る
           if(slotValue.textContent < 9) {
             slotValue.textContent ++;
+            slotValue.src = "https://farm"+images[slotValue.textContent].farm+".staticflickr.com/"+images[slotValue.textContent].server+"/"+images[slotValue.textContent].id+"_"+images[slotValue.textContent].secret+"_m.jpg"
+
           } else {
             slotValue.textContent = 0;
+            slotValue.src = "https://farm"+images[0].farm+".staticflickr.com/"+images[0].server+"/"+images[0].id+"_"+images[0].secret+"_m.jpg"
           }
   
           // スロットの数字をカウントさせる
